@@ -1,0 +1,38 @@
+package ro.fr33styler.frshop.version;
+
+import net.minecraft.server.v1_13_R2.NBTCompressedStreamTools;
+import net.minecraft.server.v1_13_R2.NBTTagCompound;
+import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+public class v1_13_R2 implements Version {
+
+    @Override
+    public byte[] serialize(ItemStack itemStack) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            NBTTagCompound tag = new NBTTagCompound();
+            tag = CraftItemStack.asNMSCopy(itemStack).save(tag);
+            NBTCompressedStreamTools.a(tag, out);
+            return out.toByteArray();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public ItemStack deserialize(byte[] data) {
+        try (ByteArrayInputStream in = new ByteArrayInputStream(data)) {
+            NBTTagCompound tag = NBTCompressedStreamTools.a(in);
+            return CraftItemStack.asBukkitCopy(net.minecraft.server.v1_13_R2.ItemStack.a(tag));
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return null;
+    }
+
+}
